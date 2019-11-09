@@ -7,37 +7,34 @@ from sendcheckASY import *
 import threading
 
 SALT = 'memkekazazaaafflolol'.encode("utf-8")  # соль для хеширования
-varcom = ['logs', 'stop', 'logsclr', 'nameclr']  # Список доступных команд
+varcom = ['logsclr', 'nameclr']  # Список доступных команд
 users = []
+port = 9090
+adress = ['localhost', '192.168.0.101']
 
-# Настройки логгинга (( Взято у умного соседа))
+
+ # Настройки логгинга (( Взято у умного соседа))
 logging.basicConfig(filename="log_serv", level=logging.INFO)
 
 with open('names.json', 'r') as file:
     names = json.load(file)
 
 
-# def serv_work():  # Сделать!!!
-#     print('Сервер работает.')
-#     print('Список доступных комманд:')
-#     print(varcom)
-#     main = True
-#     while main:
-#         command = input()
-#         if command not in varcom:
-#             print('Нет такой команды.')
-#         elif 'logs' == command:
-#             with open('log_serv', 'r') as file:
-#                 for raw in file:
-#                     print(raw)
-#         elif 'logclr' == command:
-#             with open('log_serv', 'w') as file:
-#                 pass
-#         elif 'nameclr' == command:
-#             with open('names.json', 'w') as file:
-#                 pass
-#         elif 'stop' == command:
-#             main = False
+def serv_work():  
+    print('Сервер работает.')
+    print('Список доступных комманд:')
+    print(varcom)
+    main = True
+    while main:
+        command = input()
+        if command not in varcom:
+            print('Нет такой команды.')
+        elif 'logclr' == command:
+            with open('log_serv', 'w') as file:
+                pass
+        elif 'nameclr' == command:
+            with open('names.json', 'w') as file:
+                pass
 
 def hashpass(passw: str):  # Функция хеширования данных
     return hashlib.sha512(passw.encode("utf-8") + SALT).hexdigest()
@@ -48,7 +45,7 @@ async def main(HOST, PORT):
     await server.serve_forever()
 
 
-def mem(name):  # Функция проверки ip адреса в базе
+def mem(name):  # Функция проверки имени адреса в базе
         if name not in names:
             return False
         else:
@@ -62,7 +59,7 @@ def autoriz(name, passw):  # Функция проверки пароля
         return False
 
 
-async def listen(reader, writer):
+async def listen(reader, writer):  # Основная функция работы сервера
     global users
     autor = False
     addr = writer.get_extra_info('peername')
@@ -92,17 +89,6 @@ async def listen(reader, writer):
         
 
 
-
-
-
-
-
-
-
-
-port = 9090
-portmiss = True
-adress = ['localhost', '192.168.0.101']
-
-
+work = threading.Thread(target=serv_work)
+work.start()
 asyncio.run(main(adress[0], port))
